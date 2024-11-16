@@ -13,7 +13,7 @@ import bookRoutes from './routes/bookRoutes.js'
 import transactionRoutes from './routes/transactionRoutes.js'
 
 import { connectDB } from './config/db.js'
-import { menuMiddleware } from './middlewares/menuMiddleware.js'
+import { menuMiddleware } from './middlewares/middleware.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -64,7 +64,6 @@ app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store');
     next();
 });
-
 
 app.use(cors())
 app.use(bodyParser.json())

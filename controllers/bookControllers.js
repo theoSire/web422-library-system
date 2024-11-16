@@ -1,7 +1,6 @@
 import Book from "../models/Book.js"
 import Transaction from "../models/Transaction.js";
-import { setModalMessage } from "../middlewares/authentication.js";
-import { requireLogin } from "../middlewares/authentication.js";
+import { requireLogin, setModalMessage } from "../middlewares/middleware.js";
 
 const error400Title = '400 Error'
 const error500Title = '500 - Internal Server Error'
@@ -51,7 +50,7 @@ export const searchBook = async (req, res) => {
         })
 
     } catch (err) {
-        console.log('Error searching for books:', err)
+        console.error('Error searching for books:', err)
         res.status(500).render('500', { 
             title: error500Title,
             message: 'Error searching for books.',

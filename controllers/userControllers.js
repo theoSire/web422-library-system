@@ -1,7 +1,6 @@
 import User from "../models/User.js"
 import bcrypt from 'bcrypt'
-import { resetMenuItems } from "../middlewares/menuMiddleware.js"
-import { setModalMessage } from "../middlewares/authentication.js"
+import { resetMenuItems, setModalMessage } from "../middlewares/middleware.js"
 
 const error400Title = '400 Error'
 const error500Title = '500 - Internal Server Error'
@@ -10,7 +9,6 @@ export const showRegisterPage = async (req, res) => {
     req.session.hasVisitedDonate = true
 
     const message = req.session.message || null
-    console.log("userRoutes.js register message:", message)
     delete req.session.message
     
     res.render('register', {
@@ -89,7 +87,6 @@ export const showLoginPage = async (req, res) => {
     req.session.hasVisitedDonate = true
 
     const message = req.session.message || null
-    console.log("userRoutes.js login message:", message)
     delete req.session.message 
     
     res.render('login', {

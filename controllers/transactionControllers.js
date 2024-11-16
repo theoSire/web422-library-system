@@ -1,6 +1,6 @@
 import Book from "../models/Book.js"
 import Transaction from "../models/Transaction.js"
-import { requireLogin, setModalMessage } from "../middlewares/authentication.js"
+import { requireLogin, setModalMessage } from "../middlewares/middleware.js"
 
 const error500Title = '500 - Internal Server Error'
 const transactionsTitle = 'Transactions'
@@ -23,7 +23,7 @@ export const getTransactions = async (req, res) => {
         })
         delete req.session.message
     } catch (err) {
-               console.error('Error borrowing book:', err)
+        console.error('Error borrowing book:', err)
         res.status(500).render('500', {
             title: error500Title,
             message: 'Could not retrieve transactions' 
