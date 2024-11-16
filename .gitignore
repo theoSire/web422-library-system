@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Environment files
+.env
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# Build output directories
+dist/
+build/
+
+# IDE configurations
+.vscode/
+
+# Bun specific lock file
+bun.lockb
+
+# npm lock file (optional, depending on your preference)
+package-lock.json
+
+secretKey.js
