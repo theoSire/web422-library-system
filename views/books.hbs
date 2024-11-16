@@ -1,0 +1,30 @@
+{{> modals}}
+
+<div class="container mt-4">
+    <h1 class="mb-4">{{resultsTitle}}</h1>
+
+    {{#if books.length}}
+        <div class="container">
+            <div class="row">
+                {{#each books}}
+                    <div class="col-sm-6 col-md-4 col-lg-2 mb-4">
+                        <a href="/books/{{this.ISBN}}" class="text-decoration-none">
+                            <div class="card rounded overflow-hidden shadow zoom-card" style="max-width: 250px;">
+                                <img class="img-fluid" style="height: 18.5rem;" src="{{this.image}}" alt="{{this.title}}">
+                                <div class="card-body">
+                                    <h5 class="card-title text-truncate">{{this.title}}</h5>
+                                    <p class="card-text text-truncate">{{this.author}}</p>
+                                    <p class="card-text">{{this.year}}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+    {{else}}
+        {{> contentBox 
+            content="No books available."
+        }}
+    {{/if}}
+</div>

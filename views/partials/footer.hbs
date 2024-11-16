@@ -1,0 +1,19 @@
+<footer class="bg-dark text-center text-lg-start mt-5">
+
+    {{#unless (or isAuthPage isRegistered)}}
+        <div class="d-flex justify-content-center align-items-center my-2">
+            <span class="text-white me-2">Register for free.</span>
+            <a href="/register" class="btn btn-primary">Signup</a>
+        </div>
+
+    <hr class="my-2 border-light">
+    {{/unless}}
+
+    <div class="text-center bg-dark text-white m-2 mb-3">
+        <div class="d-flex justify-content-center align-items-center m-2">
+            <a href="/" class="btn btn-dark me-4 text-decoration-underline">Home</a>
+            <a href="/about" class="btn btn-dark text-decoration-underline">About</a>
+        </div>
+        &copy; 2024 Library System. All Rights Reserved.
+    </div>
+</footer>

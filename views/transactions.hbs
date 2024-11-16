@@ -1,0 +1,43 @@
+{{> modals}}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Transactions List</h1>
+
+    {{#if transactions.length}}
+        <div class="rounded border overflow-hidden shadow">
+            <table class="table table-striped mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>User</th>
+                        <th>Book</th>
+                        <th>Status</th>
+                        <th>Borrow Date & Time</th>
+                        <th>Return Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each transactions}}
+                        <tr>
+                            <td class="border-end">{{this.userID.username}}</td>
+                            {{#if this.bookID.title}}
+                                <td class="border-end">{{this.bookID.title}}</td>
+                            {{else}}
+                                <td class="border-end">
+                                    {{this.bookTitle}}
+                                    <p class="badge bg-danger">[deleted]</p>
+                                </td>
+                            {{/if}}
+                            <td class="border-end">{{this.status}}</td>
+                            <td class="border-end">{{this.borrowDate}}</td>
+                            <td class="border-end">{{this.returnDate}}</td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    {{else}}
+        {{> contentBox 
+            content="No transactions available."
+        }}
+    {{/if}}
+</div>

@@ -1,0 +1,28 @@
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">
+                    {{#if message.title}}{{message.title}}{{/if}}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="messageContent">
+                {{#if message.content}}{{#each message.content}}<p>{{this}}</p>{{/each}}{{/if}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div> 	
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const hasMessage = {{#if message}}true{{else}}false{{/if}}
+        if (hasMessage) {
+            const messageModal = new bootstrap.Modal(document.getElementById('messageModal'))
+            messageModal.show()
+        }
+    })
+</script>

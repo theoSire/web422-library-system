@@ -1,0 +1,61 @@
+body {
+    font-family: 'inter', sans-serif;
+}
+
+.navbar-toggler {
+    background-color: transparent;
+    outline: none;
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:active {
+    box-shadow: none;
+}
+
+.navbar-toggler:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.navbar-toggler:active {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.active {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.zoom-card {
+    transition: transform 0.3s;
+}
+
+.zoom-card:hover {
+    transform: scale(1.03);
+}
+
+#toggleIconPassword, #toggleIconConfirmPassword {
+    display: none;
+    cursor: pointer;
+    margin-left: -2rem;
+    font-size: 1.17rem;
+}

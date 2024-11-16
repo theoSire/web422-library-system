@@ -1,0 +1,68 @@
+{{> modals}}
+
+{{> contentBox 
+    contentTitle="Register" 
+    content="Please provide your credentials below"
+}}
+
+<div class="container">
+    <form action="/register" method="POST">
+        <div class="form-group mb-2">
+            <label for="username">Username</label>
+            <input 
+                class="form-control" 
+                type="text" 
+                id="username" 
+                name="username" 
+                value="{{username}}" 
+                required
+            >
+        </div>
+        <div class="form-group mb-2">
+            <label for="password">Password</label>
+            <div class="d-flex align-items-center overflow-hidden">
+                <input 
+                    class="form-control" 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    minlength="8" 
+                    oninput="toggleIconVisibility('password')" 
+                    value="{{password}}" 
+                    required
+                >
+                <i onclick="togglePassword('password')" id="toggleIconPassword" class="bi bi-eye"></i>
+            </div>
+        </div>
+        <div class="form-group mb-2">
+            <label for="confirm-password">Confirm Password</label>
+            <div class="d-flex align-items-center overflow-hidden">
+                <input 
+                    class="form-control" 
+                    type="password" 
+                    id="confirm-password" 
+                    name="confirmPassword" 
+                    minlength="8" 
+                    oninput="toggleIconVisibility('confirm-password')" 
+                    value="{{confirmPassword}}" 
+                    required
+                >
+                <i onclick="togglePassword('confirm-password')" id="toggleIconConfirmPassword" class="bi bi-eye"></i>
+            </div>
+        </div>
+        <div class="form-group mb-2">
+            <label for="email">Email Address</label>
+            <input 
+                class="form-control" 
+                type="email" 
+                id="email" 
+                name="email" 
+                value="{{email}}" 
+                required
+            >
+        </div>
+        <button class="btn btn-success mt-1" type="submit">Register</button>
+    </form>
+
+    <p class="mt-3">Already have an account? <a href="/login">Login here!</a></p>
+</div>

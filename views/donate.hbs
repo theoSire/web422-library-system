@@ -1,0 +1,43 @@
+{{#if isRegistered}}
+    {{> contentBox 
+        contentTitle="Donate a Book" 
+        content="Please provide the book's details"
+    }}
+
+    <div class="container">
+            <form action="/books/donate" method="POST">
+                <div class="form-group mb-2">
+                    <label for="isbn">ISBN</label>
+                    <input class="form-control" type="text" id="isbn" name="ISBN" minlength="10" maxlength="13" required>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="book-title">Book Title</label>
+                    <input class="form-control" type="text" id="book-title" name="title" required>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="author">Author</label>
+                    <input class="form-control" type="text" id="author" name="author" required>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="year">Published Year</label>
+                    <input class="form-control" type="number" id="year" name="year" min="1000" max="9999" required>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="image-url">Image URL</label>
+                    <input class="form-control" type="url" id="image-url" name="image" required>
+                </div>
+                <button class="btn btn-success mt-1" type="submit">Donate</button>
+            </form>
+    </div>
+{{else}}
+    {{> contentBox 
+        contentTitle="Donate a Book" 
+        content="Log in or register to donate and make a difference!"
+    }}
+
+    <div class="container">
+        <a class="btn btn-success" href="/login">Log in or Register</a>
+    </div>
+{{/if}}
+
+{{> modals}}

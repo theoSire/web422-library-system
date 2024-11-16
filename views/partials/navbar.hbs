@@ -1,0 +1,34 @@
+<nav class="navbar navbar-expand-lg navbar-light sticky-top" style="color: black; background: linear-gradient(to bottom, rgb(249, 250, 251), rgba(249, 250, 251, 0))">
+    <div class="container-fluid">
+        <button 
+            class="navbar-toggler border-0" 
+            style="a"
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <i class="bi bi-list fs-1" style="color: black;"></i>
+        </button>
+        <a class="navbar-brand d-flex align-items-center ms-1" href="/" style="color: #black;">
+            <i class="bi bi-book me-1" style="color: black;"></i> Library System
+        </a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-1 mb-lg-0">
+                {{#each menuItems}}
+                <li class="nav-item rounded {{#if this.active}}active{{/if}}">
+                    <a class="nav-link rounded pe-3 {{#if this.active}}active{{/if}}" href="{{this.link}}" style="color: black;">
+                        <i class="bi {{this.icon}} fs-4 ms-3"></i> {{this.label}}
+                    </a>
+                </li>
+                {{/each}}
+            </ul>
+            <form class="d-flex px-3" action="/books/search" method="GET">
+                <input class="form-control me-2" id="search" type="search" name="query" placeholder="Search for books..." aria-label="Search" value="{{query}}" required>
+                <button class="btn btn-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
