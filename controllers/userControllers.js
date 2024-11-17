@@ -97,6 +97,7 @@ export const showLoginPage = async (req, res) => {
 }
 
 export const loginUser = async (req, res) => {
+    console.log('Login Request Body:', req.body);
     const { username, password } = req.body
     const errorMessages = []
     req.session.isAuthPage = true
@@ -127,6 +128,7 @@ export const loginUser = async (req, res) => {
             username, 
             email: user.email 
         }
+        console.log('Session after login:', req.session)
         
         res.locals.isLoggedIn = req.session.isLoggedIn
         res.locals.isRegistered = req.session.isRegistered

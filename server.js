@@ -77,11 +77,33 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use(methodOverride('_method'))
 
+app.use((req, res, next) => {
+    if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
+        return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+});
+
+app.use((req, res, next) => {
+    console.log('Session Data:', req.session);
+    console.log('Cookies:', req.cookies);
+    console.log('Is Logged In:', req.session.isLoggedIn);
+    next();
+});
+
+
+app.use((req, res, next) => {
+    console.log('Session ID:', req.sessionID);
+    console.log('Cookies:', req.cookies);
+    next();
+});
+
 app.use('/', userRoutes)
 app.use('/books', bookRoutes)
 app.use('/transactions', transactionRoutes)
 
 app.get('/', (req, res) => {
+    console.log('Accessed Home Route');
     const message = req.session.message || null
     delete req.session.message
     req.session.hasVisitedDonate = true

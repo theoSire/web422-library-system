@@ -38,7 +38,7 @@ export const menuMiddleware = (req, res, next) => {
 }
 
 export const requireLogin = (req, res, message, redirectTo) => {
-    console.log('entered requireLogin')
+    console.log('Checking login status:', req.session);
     if (!req.session.isLoggedIn) {
         setModalMessage(req, 'Login Required', message)
         req.session.redirectTo = redirectTo
