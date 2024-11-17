@@ -1,5 +1,7 @@
 import express from 'express'
 import session from 'express-session'
+import Redis from 'ioredis'
+import connectRedis from 'connect-redis'
 import { engine } from 'express-handlebars'
 import bodyParser from 'body-parser'
 import cors from 'cors'
@@ -14,6 +16,7 @@ import transactionRoutes from './routes/transactionRoutes.js'
 
 import { connectDB } from './config/db.js'
 import { menuMiddleware } from './middlewares/middleware.js'
+import RedisStore from 'connect-redis'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -21,7 +24,11 @@ const PORT = process.env.PORT || 5000
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const RedisStore = connectRedis(session)
+const redisClient = new Redis()
+
 app.use(session({
+    store: new RedisStore({ client: redisClient }),
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,

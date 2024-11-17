@@ -6,6 +6,7 @@
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "connect-flash": "^0.1.1",
+    "connect-redis": "^7.1.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
@@ -14,6 +15,7 @@
     "express-session": "^1.18.1",
     "method-override": "^3.0.0",
     "mongoose": "^8.7.2",
+    "redis": "^4.7.0",
     "serve-favicon": "^2.5.0"
   }
 }
