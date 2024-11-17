@@ -133,6 +133,7 @@ export const loginUser = async (req, res) => {
         res.locals.menuItems = resetMenuItems(req)
         
         const redirectTo = req.session.redirectTo || '/'
+        console.log("redirectTo link:", redirectTo)
         delete req.session.redirectTo
 
         setModalMessage(req, 'Success', "User logged in successfully.")
