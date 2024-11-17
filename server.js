@@ -16,7 +16,6 @@ import transactionRoutes from './routes/transactionRoutes.js'
 
 import { connectDB } from './config/db.js'
 import { menuMiddleware } from './middlewares/middleware.js'
-import RedisStore from 'connect-redis'
 
 const app = express()
 const PORT = process.env.PORT || 5000
