@@ -17,6 +17,7 @@ export const getAllBooks = async (req, res) => {
             message: req.session.message
         })
         delete req.session.message
+        req.session.save()
 
     } catch (err) {
         console.error('Error fetching books:', err)
@@ -88,6 +89,7 @@ export const getBookByISBN = async (req, res) => {
             message: req.session.message
         })
         delete req.session.message
+        req.session.save()
 
     } catch (err) {
         console.error(err)
@@ -104,7 +106,11 @@ export const showDonatePage = async (req, res) => {
     const message = req.session.message || null
     delete req.session.message 
     req.session.hasVisitedDonate = true
-    res.render('donate', { message })
+    req.session.save()
+    res.render('donate', { 
+        title: donateTitle,
+        message 
+    })
 }
 
 export const donateBook = async (req, res) => {
@@ -122,7 +128,12 @@ export const donateBook = async (req, res) => {
             isAvailable: true
         })
 
-        setModalMessage(req, 'Success', "Book donated successfully!")
+        req.session.message = {
+            title: 'Success', 
+            content: ["Book donated successfully!"]
+        }
+        req.session.save()
+
         await donation.save()
         res.render('book', {
             title,
@@ -130,14 +141,20 @@ export const donateBook = async (req, res) => {
             message: req.session.message
         })
         delete req.session.message
+        req.session.save()
 
     } catch (err) {
         let errorMessages = []
         
         if (err.code === 11000) {
             errorMessages.push('A book with this ISBN already exists.')
+            req.session.message = {
+                title: 'Error',
+                content: errorMessages
+            }
             return res.status(400).render('donate', {
-                errorMessages,
+                title: error400Title,
+                message: req.session.message,
                 ISBN,
                 title,
                 author,
@@ -149,7 +166,13 @@ export const donateBook = async (req, res) => {
         } else {
             errorMessages.push("Internal server error.")
         }
-        
+
+        req.session.message = {
+                title: error500Title,
+                content: errorMessages
+        }
+        req.session.save()
+
         return res.status(500).render('donate', {
             title: error500Title,
             error: errorMessages,
@@ -169,15 +192,30 @@ export const deleteBookByISBN = async (req, res) => {
 
         const deletedBook = await Book.findOneAndDelete({ ISBN: isbn })
         if (!deletedBook) {
-            setModalMessage(req, 'Error', `Book with ISBN ${isbn} not found`)
+            req.session.message = {
+                title: 'Error', 
+                content: [`Book with ISBN ${isbn} not found`]
+            }
+            req.session.save()
             return res.redirect('/books')
         }
        
-        setModalMessage(req, 'Success', "Book deleted successfully!")
+        req.session.message = {
+            title: 'Success', 
+            content: ["Book deleted successfully!"]
+        }
+        req.session.save()
         res.redirect('/books')
 
     } catch (err) {
         console.error(`Error deleting book with ISBN ${isbn}:`, err)
-        res.status(500).render('500', { message: 'Error deleting book' })
+        req.session.message = {
+            title: error500Title,
+            content: ['Error deleting book']
+        }
+        res.status(500).render('500', {
+            title: error500Title,
+            message: req.session.message
+        })
     }
 }

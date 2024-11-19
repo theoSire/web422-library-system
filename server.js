@@ -1,7 +1,4 @@
 import express from 'express'
-import session from 'express-session'
-import Redis from 'ioredis'
-import connectRedis from 'connect-redis'
 import { engine } from 'express-handlebars'
 import bodyParser from 'body-parser'
 import cors from 'cors'
@@ -9,37 +6,18 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import methodOverride from 'method-override'
 import favicon from 'serve-favicon'
-
 import userRoutes from './routes/userRoutes.js'
 import bookRoutes from './routes/bookRoutes.js'
 import transactionRoutes from './routes/transactionRoutes.js'
-
 import { connectDB } from './config/db.js'
 import { menuMiddleware } from './middlewares/middleware.js'
+import cookieParser from 'cookie-parser'
+import { jwtSession } from './middlewares/jwtSession.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
-
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-
-const RedisStore = connectRedis(session)
-const redisClient = new Redis()
-
-app.use(session({
-    store: new RedisStore({ client: redisClient }),
-    secret: process.env.SECRET_KEY,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000
-    }
-}))
-
-app.use(menuMiddleware)
 
 app.engine('hbs', engine({
     helpers: {
@@ -77,36 +55,39 @@ app.use((req, res, next) => {
 });
 
 app.use(cors())
+app.use(cookieParser())
+app.use(jwtSession)
+app.use(express.json())
 app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use(methodOverride('_method'))
-
-app.use((req, res, next) => {
-    if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
-        return res.redirect(`https://${req.headers.host}${req.url}`);
-    }
-    next();
-});
-
-app.use((req, res, next) => {
-    console.log('Session Data:', req.session);
-    console.log('Cookies:', req.cookies);
-    console.log('Is Logged In:', req.session.isLoggedIn);
-    next();
-});
-
-
-app.use((req, res, next) => {
-    console.log('Session ID:', req.sessionID);
-    console.log('Cookies:', req.cookies);
-    next();
-});
+app.use(menuMiddleware)
 
 app.use('/', userRoutes)
 app.use('/books', bookRoutes)
 app.use('/transactions', transactionRoutes)
+
+app.get('/env-check', (req, res) => {
+    res.send({ vercelEnv: process.env.VERCEL_ENV });
+})
+
+app.get('/protected', (req, res) => {
+    if (!req.session || !req.session.userID) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    res.status(200).json({ message: 'Access granted', session: req.session });
+});
+
+app.post('/update-session', (req, res) => {
+    req.session.customData = 'Updated value';
+    req.session.save(() => {
+        res.status(200).json({ message: 'Session updated' });
+    });
+    console.log(req.cookies)
+});
 
 app.get('/', (req, res) => {
     console.log('Accessed Home Route');
@@ -122,6 +103,17 @@ app.use('/about', (req, res) => {
     })
 })
 
+// Add this after your jwtSession middleware
+// app.use((req, res, next) => {
+//     console.log('\n--- Session Debug Info ---');
+//     console.log('Session Contents:', req.session);
+//     console.log('Cookie Header:', req.headers.cookie);
+//     console.log('JWT Cookie:', req.cookies?.session);
+//     console.log('Is Logged In:', req.session.isLoggedIn);
+//     console.log('------------------------\n');
+//     next();
+// });
+
 app.use((req, res) => {
     res.status(404).render('error', {
         title: '404 - Not Found',
@@ -129,7 +121,7 @@ app.use((req, res) => {
     })
 })
 
-app.use((err, res) => {
+app.use((err, req, res, next) => {
     res.status(500).render('500', { 
         title: '500 - Internal Server Error',
         message: err.message || "Something went wrong on our end. Please try again later."

@@ -21,7 +21,6 @@ export const resetMenuItems = (req) => {
 
 export const menuMiddleware = (req, res, next) => {
     req.session = req.session || {}
-
     res.locals.isRegistered = req.session.isRegistered || false
     res.locals.isLoggedIn = req.session.isLoggedIn || false
     res.locals.isAuthPage = req.session.isAuthPage || false
@@ -40,8 +39,12 @@ export const menuMiddleware = (req, res, next) => {
 export const requireLogin = (req, res, message, redirectTo) => {
     console.log('Checking login status:', req.session);
     if (!req.session.isLoggedIn) {
-        setModalMessage(req, 'Login Required', message)
+        req.session.message = {
+            title: 'Login Required',
+            content: [message]
+        }
         req.session.redirectTo = redirectTo
+        req.session.save()
         console.log("req.session.redirectTo ensureAuth:", req.session.redirectTo)
         return res.redirect('/login')
     }
@@ -57,5 +60,13 @@ export const setModalMessage = (req, title, content) => {
     req.session.message = {
         title,
         content
+    }
+    req.session.save()
+}
+
+export const clearSessionMessage = (req) => {
+    if (req.session && res.session.message) {
+        delete req.session.message
+        req.session.save()
     }
 }
