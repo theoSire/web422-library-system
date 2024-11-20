@@ -42,7 +42,6 @@ export const setAuthPageFlag = (req, res, next) => {
 }
 
 export const requireLogin = (req, res, message, redirectTo) => {
-    console.log('Checking login status:', req.session);
     if (!req.session.isLoggedIn) {
         req.session.message = {
             title: 'Login Required',
@@ -53,7 +52,6 @@ export const requireLogin = (req, res, message, redirectTo) => {
             if (err) {
                 console.error('Error saving session:', err)
             }
-            console.log("req.session.redirectTo ensureAuth:", req.session.redirectTo)
             res.redirect('/login')
         })
         return false

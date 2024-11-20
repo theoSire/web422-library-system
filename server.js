@@ -5,41 +5,34 @@ import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import methodOverride from 'method-override'
+import cookieParser from 'cookie-parser'
 import favicon from 'serve-favicon'
+import mongoose from 'mongoose'
+import { connectDB } from './config/db.js'
+import { jwtSession } from './middlewares/jwtSession.js'
+import { menuMiddleware, setAuthPageFlag } from './middlewares/middleware.js'
 import userRoutes from './routes/userRoutes.js'
 import bookRoutes from './routes/bookRoutes.js'
 import transactionRoutes from './routes/transactionRoutes.js'
-import { connectDB } from './config/db.js'
-import { menuMiddleware } from './middlewares/middleware.js'
-import cookieParser from 'cookie-parser'
-import { jwtSession } from './middlewares/jwtSession.js'
-import { setAuthPageFlag } from './middlewares/middleware.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// configure handlebars with custom template helpers for conditional rendering
 app.engine('hbs', engine({
     helpers: {
         statusBadge: (status) => {
             return status === 'available' ? 'bg-success' : 'bg-danger';
         },
-        isEndOfRow: (index) => {
-            return (index + 1) % 4 === 0; // Adjust based on how many columns you want per row
-        },
-        and: (a, b) => {
-            return a && b
-        },
-        or: (a, b) => {
-            return a || b
-        },
-        not: (value) => {
-            return !value
-        },
         statusChecker: (status) => {
             return status === 'available'
-        }
+        },
+        // logical helpers
+        and: (a, b) => a && b,
+        or: (a, b) => a || b,
+        not: (value) => !value
     },
     defaultLayout: 'main',
     extname: '.hbs'
@@ -48,13 +41,16 @@ app.engine('hbs', engine({
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
 
+// establish database connection
 connectDB();
 
+// prevent browser caching of dynamic content
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store');
     next();
 });
 
+// middleware for request processing
 app.use(cors())
 app.use(cookieParser())
 app.use(jwtSession)
@@ -64,58 +60,29 @@ app.use(express.urlencoded({ extended: true }))
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use(methodOverride('_method'))
+
+// custom middleware for navigation and authentication
 app.use(menuMiddleware)
 app.use(setAuthPageFlag)
 
+// route configurations
 app.use('/', userRoutes)
 app.use('/books', bookRoutes)
 app.use('/transactions', transactionRoutes)
 
-app.get('/env-check', (req, res) => {
-    res.send({ vercelEnv: process.env.VERCEL_ENV });
-})
-
-app.get('/protected', (req, res) => {
-    if (!req.session || !req.session.userID) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    res.status(200).json({ message: 'Access granted', session: req.session });
-});
-
-app.post('/update-session', (req, res) => {
-    req.session.customData = 'Updated value';
-    req.session.save(() => {
-        res.status(200).json({ message: 'Session updated' });
-    });
-    console.log(req.cookies)
-});
-
+// Home route with session message handling
 app.get('/', (req, res) => {
-    console.log('Accessed Home Route');
-    const message = req.session.message || null
+    const message = req?.session?.message || null
     delete req.session.message
-    req.session.hasVisitedDonate = true
     res.render('index', { title: 'Home', message })
 })
 
+// About page route
 app.use('/about', (req, res) => {
-    res.render('about', {
-        title: 'About'
-    })
+    res.render('about', { title: 'About' })
 })
 
-// Add this after your jwtSession middleware
-// app.use((req, res, next) => {
-//     console.log('\n--- Session Debug Info ---');
-//     console.log('Session Contents:', req.session);
-//     console.log('Cookie Header:', req.headers.cookie);
-//     console.log('JWT Cookie:', req.cookies?.session);
-//     console.log('Is Logged In:', req.session.isLoggedIn);
-//     console.log('------------------------\n');
-//     next();
-// });
-
+// 404 error handler for undefined routes
 app.use((req, res) => {
     res.status(404).render('error', {
         title: '404 - Not Found',
@@ -123,6 +90,7 @@ app.use((req, res) => {
     })
 })
 
+// global error handling middleware
 app.use((err, req, res, next) => {
     res.status(500).render('500', { 
         title: '500 - Internal Server Error',
@@ -130,6 +98,21 @@ app.use((err, req, res, next) => {
     })
 })
 
-app.listen(PORT, () => {
+// start server
+const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
+})
+
+// handle graceful shutdown on SIGINT (for example: Ctrl+C)
+process.on('SIGINT', async () => {
+    console.log('SIGINT received. Shutting down gracefully...')
+    server.close(() => {
+        console.log('Server closed.')
+    })
+
+    // close database connection
+    await mongoose.connection.close()
+    console.log('MongoDB connection closed')
+    // exit the process
+    process.exit(0)
 })

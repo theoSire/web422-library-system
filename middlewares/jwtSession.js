@@ -57,10 +57,6 @@ export const generateToken = (data) => {
 }
 
 export const verifyToken = (token) => {
-    if (!token) {
-        throw new Error('Token not provided')
-    }
-
     try {
         const decoded = jwt.verify(token, JWT_SECRET)
         return decoded
@@ -69,8 +65,7 @@ export const verifyToken = (token) => {
         if (err.name === 'TokenExpiredError') {
             console.error('Token expired at:', err.expiredAt)
             throw new Error('Session expired. Please log in again.')
-        } else {
-            throw new Error('Invalid token')
         }
+        throw new Error('Invalid token')
     }
 }

@@ -10,7 +10,6 @@ export const showRegisterPage = async (req, res) => {
     
     const message = req.session.message || null
     delete req.session.message
-    req.session.isAuthPage = true
     req.session.save()
     
     res.render('register', {
@@ -105,7 +104,6 @@ export const showLoginPage = async (req, res) => {
 }
 
 export const loginUser = async (req, res) => {
-    console.log('Login Request Body:', req.body);
     const { username, password } = req.body
     const errorMessages = []
     req.session.isAuthPage = true
@@ -137,14 +135,12 @@ export const loginUser = async (req, res) => {
             username, 
             email: user.email 
         }
-        console.log('Session after login:', req.session)
         
         res.locals.isLoggedIn = req.session.isLoggedIn
         res.locals.isRegistered = req.session.isRegistered
         res.locals.menuItems = resetMenuItems(req)
         
         const redirectTo = req.session.redirectTo || '/'
-        console.log("redirectTo link:", redirectTo)
         delete req.session.redirectTo
 
         req.session.message = { title: 'Success', content: ["User logged in successfully."] }
