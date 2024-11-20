@@ -49,9 +49,14 @@ export const requireLogin = (req, res, message, redirectTo) => {
             content: [message]
         }
         req.session.redirectTo = redirectTo
-        req.session.save()
-        console.log("req.session.redirectTo ensureAuth:", req.session.redirectTo)
-        return res.redirect('/login')
+        req.session.save((err) => {
+            if (err) {
+                console.error('Error saving session:', err)
+            }
+            console.log("req.session.redirectTo ensureAuth:", req.session.redirectTo)
+            res.redirect('/login')
+        })
+        return false
     }
     return true
 }
