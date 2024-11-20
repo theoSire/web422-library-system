@@ -10,16 +10,18 @@ const booksTitle = 'Book List'
 export const getAllBooks = async (req, res) => {
     try {
         const books = await Book.find().lean()
-        res.render('books', {
-            title: booksTitle,
-            books, 
-            resultsTitle: "Book List",
-            message: req.session.message,
-            isAuthPage: false
-        })
+
+        const message = req.session.message || null
         delete req.session.message
         req.session.save()
 
+        res.render('books', {
+            title: booksTitle,
+            books, 
+            resultsTitle: booksTitle,
+            message,
+            isAuthPage: false
+        })
     } catch (err) {
         console.error('Error fetching books:', err)
         res.status(500).render('error', { 
@@ -34,7 +36,7 @@ export const searchBook = async (req, res) => {
     const query = req.query.query
     
     try {
-         const books = await Book.find({
+        const books = await Book.find({
             title: { $regex: new RegExp(query, 'i') }
         }).lean();
 
@@ -85,17 +87,18 @@ export const getBookByISBN = async (req, res) => {
 
         const isBookBorrowed = transaction ? true : false
         const isUserAlreadyBorrowed = transaction && transaction.userID._id.toString() === userID
+        
 
+        const message = req.session.message || null
+        delete req.session.message
+        req.session.save()
         res.render('book', {
             title: `${book.booksTitle}`,
             book,
             isBookBorrowed,
             isUserAlreadyBorrowed,
-            message: req.session.message
+            message
         })
-        delete req.session.message
-        req.session.save()
-
     } catch (err) {
         console.error(err)
         res.status(500).render('error', { 
@@ -108,9 +111,9 @@ export const getBookByISBN = async (req, res) => {
 export const showDonatePage = async (req, res) => {
     if (!requireLogin(req, res, "Please log in to donate the book.", '/books/donate')) return
 
+    req.session.hasVisitedDonate = true
     const message = req.session.message || null
     delete req.session.message 
-    req.session.hasVisitedDonate = true
     req.session.save()
     res.render('donate', { 
         title: donateTitle,
@@ -133,33 +136,28 @@ export const donateBook = async (req, res) => {
             isAvailable: true
         })
 
-        req.session.message = {
+        message = {
             title: 'Success', 
             content: ["Book donated successfully!"]
         }
-        req.session.save()
-
         await donation.save()
         res.render('book', {
             title,
             book: donation.toObject(), 
-            message: req.session.message
+            message
         })
-        delete req.session.message
-        req.session.save()
-
     } catch (err) {
         let errorMessages = []
         
         if (err.code === 11000) {
             errorMessages.push('A book with this ISBN already exists.')
-            req.session.message = {
-                title: 'Error',
+            message = {
+                title: error400Title,
                 content: errorMessages
             }
             return res.status(400).render('donate', {
                 title: error400Title,
-                message: req.session.message,
+                message,
                 ISBN,
                 title,
                 author,
@@ -172,11 +170,10 @@ export const donateBook = async (req, res) => {
             errorMessages.push("Internal server error.")
         }
 
-        req.session.message = {
-                title: error500Title,
-                content: errorMessages
+        message = {
+            title: error500Title,
+            content: errorMessages
         }
-        req.session.save()
 
         return res.status(500).render('donate', {
             title: error500Title,
@@ -211,16 +208,15 @@ export const deleteBookByISBN = async (req, res) => {
         }
         req.session.save()
         res.redirect('/books')
-
     } catch (err) {
         console.error(`Error deleting book with ISBN ${isbn}:`, err)
-        req.session.message = {
+        message = {
             title: error500Title,
             content: ['Error deleting book']
         }
         res.status(500).render('500', {
             title: error500Title,
-            message: req.session.message
+            message
         })
     }
 }
