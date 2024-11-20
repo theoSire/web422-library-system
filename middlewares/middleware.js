@@ -36,6 +36,11 @@ export const menuMiddleware = (req, res, next) => {
     next()
 }
 
+export const setAuthPageFlag = (req, res, next) => {
+    res.locals.isAuthPage = (req.path === '/login' || req.path === '/register') ? true : false
+    next()
+}
+
 export const requireLogin = (req, res, message, redirectTo) => {
     console.log('Checking login status:', req.session);
     if (!req.session.isLoggedIn) {
@@ -51,22 +56,8 @@ export const requireLogin = (req, res, message, redirectTo) => {
     return true
 }
 
-export const setModalMessage = (req, title, content) => {
-    if (!Array.isArray(content)) {
-        console.log('is not an array')
-        content = [content]
-    }
-    
-    req.session.message = {
-        title,
-        content
-    }
-    req.session.save()
-}
-
 export const clearSessionMessage = (req) => {
-    if (req.session && res.session.message) {
+    if (req && req.session && req.session.message) {
         delete req.session.message
-        req.session.save()
     }
 }

@@ -7,10 +7,11 @@ const error500Title = '500 - Internal Server Error'
 
 export const showRegisterPage = async (req, res) => {
     req.session.hasVisitedDonate = true
-    req.session.save()
-
+    
     const message = req.session.message || null
     delete req.session.message
+    req.session.isAuthPage = true
+    req.session.save()
     
     res.render('register', {
         title: 'Register',
@@ -90,10 +91,11 @@ export const registerUser = async (req, res) => {
 
 export const showLoginPage = async (req, res) => {
     req.session.hasVisitedDonate = true
-    req.session.save()
 
     const message = req.session.message || null
-    delete req.session.message 
+    delete req.session.message
+    req.session.isAuthPage = true
+    req.session.save()
     
     res.render('login', {
         title: 'Login',
@@ -146,6 +148,7 @@ export const loginUser = async (req, res) => {
         delete req.session.redirectTo
 
         req.session.message = { title: 'Success', content: ["User logged in successfully."] }
+        req.isAuthPage = false
         req.session.save()
 
         res.redirect(redirectTo)
@@ -170,32 +173,31 @@ export const logoutUser = async (req, res) => {
     try {
         if (req.session) {
             req.session.isLoggedIn = false
-            res.locals.isLoggedIn = false
             req.session.isRegistered = false
-            res.locals.isRegistered = false
             
-            req.session.message = { title: 'Success', content: ["User logged out successfully."] }
+            req.session.message = {
+                title: 'Success', 
+                content: ["User logged out successfully."]
+            }
+
             req.session.save(() => {
                 res.locals.menuItems = resetMenuItems(req)
-                return res.render('index', {
+                res.render('index', {
                     title: 'Home',
                     message: req.session.message
                 })
+                delete req.session.message
+                req.session.save()
             })
         } else {
             return res.redirect('/login')
         }
     } catch (err) {
         console.error('Logout Error:', err)
-        req.session.message = {
-            title: error500Title,
-            content: ['An unexpected error occurred during logout. Please try again later.']
-        }
-        req.session.save()
 
         return res.status(500).render('500', {
             title: error500Title,
-            message: req.session.message
+            message: 'An unexpected error occurred during logout. Please try again later.'
         })
     }
 }

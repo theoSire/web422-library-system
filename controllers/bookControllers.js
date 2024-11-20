@@ -1,6 +1,6 @@
 import Book from "../models/Book.js"
 import Transaction from "../models/Transaction.js";
-import { requireLogin, setModalMessage } from "../middlewares/middleware.js";
+import { requireLogin } from "../middlewares/middleware.js";
 
 const error400Title = '400 Error'
 const error500Title = '500 - Internal Server Error'
@@ -14,7 +14,8 @@ export const getAllBooks = async (req, res) => {
             title: booksTitle,
             books, 
             resultsTitle: "Book List",
-            message: req.session.message
+            message: req.session.message,
+            isAuthPage: false
         })
         delete req.session.message
         req.session.save()
@@ -23,7 +24,8 @@ export const getAllBooks = async (req, res) => {
         console.error('Error fetching books:', err)
         res.status(500).render('error', { 
             title: error500Title,
-            message: 'Error retrieving books' 
+            message: 'Error retrieving books',
+            isAuthPage: false
         })
     }
 }
@@ -40,14 +42,16 @@ export const searchBook = async (req, res) => {
             return res.status(404).render('error', { 
                 title: error400Title,
                 message: 'No books found.',
-                query
+                query,
+                isAuthPage: false
             })
         }
         res.render('books', { 
             title: `${query} - Search`,
             books,
             query,
-            resultsTitle: `Search Results for: ${query}`
+            resultsTitle: `Search Results for: ${query}`,
+            isAuthPage: false
         })
 
     } catch (err) {
@@ -55,7 +59,8 @@ export const searchBook = async (req, res) => {
         res.status(500).render('500', { 
             title: error500Title,
             message: 'Error searching for books.',
-            query
+            query,
+            isAuthPage: false
         })
     }
 }

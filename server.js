@@ -13,6 +13,7 @@ import { connectDB } from './config/db.js'
 import { menuMiddleware } from './middlewares/middleware.js'
 import cookieParser from 'cookie-parser'
 import { jwtSession } from './middlewares/jwtSession.js'
+import { setAuthPageFlag } from './middlewares/middleware.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -64,6 +65,7 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use('/static', express.static(path.join(__dirname, 'public')))
 app.use(methodOverride('_method'))
 app.use(menuMiddleware)
+app.use(setAuthPageFlag)
 
 app.use('/', userRoutes)
 app.use('/books', bookRoutes)

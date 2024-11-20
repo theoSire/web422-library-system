@@ -66,7 +66,11 @@ export const verifyToken = (token) => {
         return decoded
     } catch (err) {
         console.error('Invalid Token:', err)
-        throw new Error('Invalid or expired token')
+        if (err.name === 'TokenExpiredError') {
+            console.error('Token expired at:', err.expiredAt)
+            throw new Error('Session expired. Please log in again.')
+        } else {
+            throw new Error('Invalid token')
+        }
     }
-
 }

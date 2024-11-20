@@ -1,6 +1,6 @@
 import Book from "../models/Book.js"
 import Transaction from "../models/Transaction.js"
-import { requireLogin, setModalMessage } from "../middlewares/middleware.js"
+import { requireLogin } from "../middlewares/middleware.js"
 
 const error500Title = '500 - Internal Server Error'
 const transactionsTitle = 'Transactions'
@@ -41,7 +41,11 @@ export const borrowBook = async (req, res) => {
         if (!requireLogin(req, res, "Please log in to borrow the book.", `/books/${book.ISBN}`)) return
 
         if (!book || book.status !== 'available') {
-            setModalMessage(req, 'Error', "The book is currently unavailable.")
+            req.session.message = {
+                title: 'Error', 
+                content: ["The book is currently unavailable."]
+            }
+            req.session.save()
             return res.redirect(`/books/${book.ISBN}`)
         }
 
@@ -58,7 +62,11 @@ export const borrowBook = async (req, res) => {
         book.status = 'borrowed'
         await book.save()
 
-        setModalMessage(req, 'Success', "Book borrowed successfully.")
+        req.session.message = {
+            title: 'Success', 
+            content: "Book borrowed successfully."
+        }
+        req.session.save()
         res.redirect(`/books/${book.ISBN}`)
     } catch (err) {
         console.error('Error borrowing book:', err)
@@ -83,7 +91,11 @@ export const returnBook = async (req, res) => {
         })
         
         if (!transaction || transaction.status === 'returned') {
-            setModalMessage(req, 'Error', "Transaction not found or already returned.")
+            req.session.message = {
+                title: 'Error', 
+                content: ["Transaction not found or already returned."]
+            }
+            req.session.save()
             return res.redirect(`/books/${book.ISBN}`)
         }
         
@@ -94,7 +106,11 @@ export const returnBook = async (req, res) => {
         book.status = 'available'
         await book.save()
 
-        setModalMessage(req, 'Success', "Book returned successfully.")
+        req.session.message = {
+            title: 'Success', 
+            content: ["Book returned successfully."]
+        }
+        req.session.save()
         res.redirect(`/books/${book.ISBN}`)
     } catch (err) {
         console.error('Error returning book:', err)
