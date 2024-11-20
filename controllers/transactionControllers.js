@@ -22,6 +22,7 @@ export const getTransactions = async (req, res) => {
             message: req.session.message
         })
         delete req.session.message
+        req.session.save()
     } catch (err) {
         console.error('Error borrowing book:', err)
         res.status(500).render('500', {
