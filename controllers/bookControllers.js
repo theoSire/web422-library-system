@@ -193,7 +193,7 @@ export const donateBook = async (req, res) => {
 export const deleteBookByISBN = async (req, res) => {
     const { isbn } = req.params
     try {
-        if (!requireLogin(req, res, "Please log in to delete the book.", '/books')) return;
+        if (!requireLogin(req, res, "Please log in to delete the book.", `/books/${isbn}`)) return;
 
         const deletedBook = await Book.findOneAndDelete({ ISBN: isbn })
         if (!deletedBook) {
