@@ -20,7 +20,9 @@
                         <tr>
                             <td class="border-end">{{this.userID.username}}</td>
                             {{#if this.bookID.title}}
-                                <td class="border-end">{{this.bookID.title}}</td>
+                                <td class="border-end">
+                                    <a href="/books/{{this.bookID.ISBN}}" class="link-dark">{{this.bookID.title}}</a>
+                                </td>
                             {{else}}
                                 <td class="border-end">
                                     {{this.bookTitle}}
