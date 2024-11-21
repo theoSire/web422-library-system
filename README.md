@@ -5,16 +5,16 @@
 
 A Library Management System built with Node.js & Express.
 
-## Resources
+## Resources 🛠️
 
-- [Node.js](https://nodejs.org/en/docs)
-- [Express](http://expressjs.com/en/starter/installing.html)
-- [MongoDB](https://www.mongodb.com/docs/)
+- [Node.js](https://nodejs.org/en/docs) 🌐
+- [Express](http://expressjs.com/en/starter/installing.html) 🚀
+- [MongoDB](https://www.mongodb.com/docs/) 🍃
 - [Handlebars](https://handlebarsjs.com/)
 - [JWT \(JSON Web Tokens\)](https://jwt.io)
 - [Bootstrap](https://getbootstrap.com/docs/5.0)
 
-## Installation
+## Installation 🖥️
 
 1. Clone the repo.
 
@@ -34,7 +34,7 @@ A Library Management System built with Node.js & Express.
 
 It should be up and running at `http://localhost:3000`.
 
-## Key Features
+## Key Features ✨
 
 - **Register/Login**: Create an account to manage transactions and donations.
 
@@ -44,22 +44,22 @@ It should be up and running at `http://localhost:3000`.
 
 - **Transaction History**: View your borrowing and returning history on the `/transactions` page.
 
-## API Endpoints
+## API Endpoints 🌐
 
-### Books
+### Books 📚
 
 - `GET /books`: Fetch all books.
 - `POST /books/donate`: Donate a book (requires title and author).
 - `GET /books/:isbn`: Fetch books details by ISBN.
 - `DELETE /books/:isbn`: Delete a book by ISBN.
 
-### Transactions
+### Transactions 🔄
 
 - `GET /transactions`: Fetch all transactions.
 - `POST /transactions/borrow`: Borrow a book (requires user and book ID).
 - `POST /transactions/return`: Return a book.
 
-### Authentication
+### Authentication 🔐
 
 - `POST /login`: User login.
 - `POST /register`: User registration.
