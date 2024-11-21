@@ -75,7 +75,7 @@ export const borrowBook = async (req, res) => {
 
         req.session.message = {
             title: 'Success', 
-            content: "Book borrowed successfully."
+            content: ["Book borrowed successfully."]
         }
         req.session.save()
         res.redirect(`/books/${book.ISBN}`)
