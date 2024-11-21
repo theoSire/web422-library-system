@@ -1,4 +1,4 @@
-# Library Management System
+# Library Management System 📚
 
 ![Books List](./public/img/screenshots/books_list.png)
 ![Book](./public/img/screenshots/book.png)
