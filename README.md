@@ -51,6 +51,7 @@ It should be up and running at `http://localhost:3000`.
 - `GET /books`: Fetch all books.
 - `POST /books/donate`: Donate a book (requires title and author).
 - `GET /books/:isbn`: Fetch books details by ISBN.
+-  `PUT /books/:isbn`: Edit books details by ISBN.
 - `DELETE /books/:isbn`: Delete a book by ISBN.
 
 ### Transactions 🔄
