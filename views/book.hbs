@@ -35,9 +35,12 @@
                         {{else}}
                             <form action="/transactions/borrow" method="POST" onsubmit="return confirm('Are you sure you want to borrow this book?');">
                                 <input type="hidden" name="bookID" value="{{book._id}}">
-                                <button type="submit" class="btn btn-info">Borrow Book</button>
+                                <button type="submit" class="btn btn-success">Borrow Book</button>
                             </form>
                         {{/if}}
+                        <form action="/books/edit/{{book.ISBN}}?_method=PUT" method="POST" onsubmit="return confirm('Are you sure you want to edit the book's details?');">
+                            <button type="submit" class="btn btn-info">Edit Book</button>
+                        </form>
                         <form action="/books/{{book.ISBN}}?_method=DELETE" method="POST" onsubmit="return confirm('Are you sure you want to delete this book?');">
                             <button type="submit" class="btn btn-danger">Delete Book</button>
                         </form>

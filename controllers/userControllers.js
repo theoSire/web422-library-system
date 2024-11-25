@@ -72,15 +72,11 @@ export const registerUser = async (req, res) => {
 
     } catch (err) {
         console.error("Error registering user:", err)
-        let errorMessages = []
-        
-        // check if the error is a validation error from mongoose
-        if (err.name === 'ValidationError') {
-            errorMessages.push(err.message)
-        } else {
-            errorMessages.push("Internal server error.")
-        }
 
+        // check if the error is a validation error from mongoose and set the appropriate error
+        const errorMessages = err.name === 'ValidationError'
+            ? [err.message] : ["Internal server error."]
+        
         // set error message and render the registration page again with error details
         req.session.message = { title: error500Title, content: errorMessages }
         req.session.save()
@@ -131,13 +127,13 @@ export const loginUser = async (req, res) => {
         // display validation errors, if any
         if (errorMessages.length > 0) {
             req.session.message = { title: 'Error', content: errorMessages }
-            req.session.save()
-
-            return res.status(400).render('login', {
-                title: error400Title,
-                message: req.session.message,
-                username,
-                password
+            return req.session.save(() => {
+                res.status(400).render('login', {
+                    title: error400Title,
+                    message: req.session.message,
+                    username,
+                    password
+                })
             })
         }
 
@@ -155,29 +151,27 @@ export const loginUser = async (req, res) => {
         res.locals.isRegistered = req.session.isRegistered
         res.locals.menuItems = resetMenuItems(req)
         
-        // redirect to the appropriate page after login
+        // prepare success message and redirection page
+        req.session.message = { title: 'Success', content: ["User logged in successfully."] }
         const redirectTo = req.session.redirectTo || '/'
         delete req.session.redirectTo
-
-        // set success message in session
-        req.session.message = { title: 'Success', content: ["User logged in successfully."] }
         req.isAuthPage = false
-        req.session.save()
 
-        res.redirect(redirectTo)
+        return req.session.save(() => {
+            res.redirect(redirectTo)
+        })
 
     } catch (err) {
         console.error("Login error:", err)
-        const errorMessages = ["An error occurred. Please try again later."]
 
-        req.session.message = { title: error500Title, content: errorMessages }
-        req.session.save()
-
-        return res.status(500).render('login', {
-            title: error500Title,
-            message: req.session.message,
-            username,
-            password
+        req.session.message = { title: error500Title, content: ["An error occurred. Please try again later."] }
+        return req.session.save(() => {
+            res.status(500).render('login', {
+                title: error500Title,
+                message: req.session.message,
+                username,
+                password
+            })
         })
     }
 }
@@ -186,7 +180,7 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
     try {
         if (req.session) {
-            // log the user out by clearing session variables
+            // clear session variables to log out the user
             req.session.isLoggedIn = false
             req.session.isRegistered = false
             
@@ -198,17 +192,13 @@ export const logoutUser = async (req, res) => {
             // save the session and render the home page
             req.session.save(() => {
                 res.locals.menuItems = resetMenuItems(req)
-                res.render('index', {
-                    title: 'Home',
-                    message: req.session.message
-                })
-                delete req.session.message
-                req.session.save()
+                res.redirect('/')
             })
-        } else {
+        } else { 
             // if no session exists, redirect to login page
             return res.redirect('/login')
         }
+
     } catch (err) {
         console.error('Logout Error:', err)
 

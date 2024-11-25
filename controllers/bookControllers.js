@@ -5,14 +5,12 @@ import { requireLogin } from '../middlewares/middleware.js'
 // titles for various pages and error types
 const error400Title = '400 Error'
 const error500Title = '500 - Internal Server Error'
-const donateTitle = 'Donate'
 const booksTitle = 'Book List'
 
 // fetch all books and render the books list page
 export const getAllBooks = async (req, res) => {
     try {
-        // retrieve all books from the db
-        const books = await Book.find().lean()
+        const books = await Book.find().lean() // retrieve all books from the db
 
         // retrieve session messages, if any
         const message = req.session.message || null
@@ -95,7 +93,7 @@ export const getBookByISBN = async (req, res) => {
         const isBookBorrowed = transaction ? true : false
         const isUserAlreadyBorrowed = transaction && transaction.userID._id.toString() === userID
 
-        // retrieve session messages, if any
+        // retrieve and clear session messages, if any
         const message = req.session.message || null
         delete req.session.message
         req.session.save()
@@ -128,7 +126,7 @@ export const showDonatePage = async (req, res) => {
     req.session.save()
 
     res.render('donate', { 
-        title: donateTitle,
+        title: 'Donate',
         message 
     })
 }
@@ -155,43 +153,121 @@ export const donateBook = async (req, res) => {
         await donation.save()
 
         // success message
-        message = {
+        req.session.message = { 
             title: 'Success', 
-            content: ['Book donated successfully!']
+            content: ['Book donated successfully!'] 
         }
-        res.render('book', {
-            title,
-            book: donation.toObject(), 
-            message
-        })
+        req.session.save()
+        delete req.session.message
+
+        res.redirect(`/books/${donation.ISBN}`)
     } catch (err) {
+        console.error("Error donating book:", err)
         let errorMessages = []
         
         // handle duplicate ISBN error
         if (err.code === 11000) {
             errorMessages.push('A book with this ISBN already exists.')
-        } else if (err.name === 'ValidationError') {
-            // handle validation errors
+        } else if (err.name === 'ValidationError') { // handle validation errors
             errorMessages.push(err.message)
         } else {
-            // generic server error
             errorMessages.push('Internal server error.')
-        }
-
-        const message = {
-            title: error500Title,
-            content: errorMessages
         }
 
         // render the donate with error message in the modal
         return res.status(500).render('donate', {
             title: error500Title,
-            message,
+            message: { title: error500Title, content: errorMessages },
             ISBN,
             title,
             author,
             year,
             image,
+        })
+    }
+}
+
+// displays the edit book
+export const showEditPage = async (req, res) => {
+    const { isbn } = req.params
+
+    try {
+        // check if the user is logged in before accessing edit page
+        if (!requireLogin(req, res, 'Please log in to edit the book.', `/books/edit/${isbn}`)) return
+    
+        const message = req.session.message || null
+        delete req.session.message 
+        req.session.save()
+    
+        const book = await Book.findOne({ ISBN: isbn }).lean()
+
+        if (!book) { // renders an error page, if book is not found
+            return res.status(404).render('error', {
+                title: '404 - Not Found',
+                message: 'Book not found'
+            })
+        }
+    
+        res.render('edit', { 
+            title: 'Edit',
+            book,
+            message 
+        })
+    } catch (err) {
+        console.error('Error retrieving book for editing:', err)
+        res.status(500).render('error', {
+            title: error500Title,
+            message: 'An error occurred while trying to load the edit page.'
+        })
+    }
+}
+
+// edit book information by ISBN
+export const editBookByISBN = async (req, res) => {
+    const { isbn } = req.params
+    const updatedData = req.body
+
+    try {
+        // update the book with the given ISBN and return the updated document
+        const book = await Book.findOneAndUpdate(
+            { ISBN: isbn },
+            updatedData,
+            { new: true }
+        )
+
+        // if the book is not found, render a 404 error page
+        if (!book) {
+            return res.status(404).render('error', { 
+                title: error400Title,
+                message: 'Book not found' 
+            })
+        }
+
+        // success message
+        req.session.message = {
+            title: 'Success', 
+            content: ['Book info updated successfully!']
+        }
+
+        res.locals.title = 'Edit Book'
+        req.session.save()
+        res.redirect(`/books/${book.ISBN}`)
+        delete req.session.message
+    } catch (err) {
+        console.error("Error updating book:", err)
+
+        // render the edit page with error messgaes
+        const message = {
+            title: error500Title,
+            content: ['Error updating book']
+        }
+        req.session.save()
+
+        // render the donate with error message in the modal
+        return res.status(500).render('edit', {
+            title: error500Title,
+            message,
+            updatedData
         })
     }
 }

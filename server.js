@@ -74,7 +74,9 @@ app.use('/transactions', transactionRoutes)
 app.get('/', (req, res) => {
     const message = req?.session?.message || null
     delete req.session.message
-    res.render('index', { title: 'Home', message })
+    req.session.save()
+
+    return res.render('index', { title: 'Home', message })
 })
 
 // About page route
