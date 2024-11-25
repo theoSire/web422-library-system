@@ -28,11 +28,24 @@ A Library Management System built with Node.js & Express.
     - Using npm: `npm install`
     - Using bun: `bun install`
 
-4. Start the application:
+4. Set up environment variables:
+
+Create a `.env` file in the root directory and define the following variables:
+
+```
+PORT=3000                     # The port on which the server will run.
+MONGODB_URI=your_mongo_uri    # Connection string for your MongoDB database.
+SECRET_KEY=your_secret_key    # Secret key for encrypting sensitive data.
+NODE_ENV=development          # Environment mode ('development' or 'production').
+JWT_SECRET=your_jwt_secret    # Secret key for signing JSON Web Tokens.
+VERCEL_ENV=local              # Set to 'local' for development or 'production' on Vercel.
+```
+
+5. Start the application:
     - Using npm: `npm start`
     - Using bun: `bun start`
 
-It should be up and running at `http://localhost:3000`.
+It should be up and running at `http://localhost:5000`.
 
 ## Key Features ✨
 
@@ -65,7 +78,7 @@ It should be up and running at `http://localhost:3000`.
 - `POST /login`: User login.
 - `POST /register`: User registration.
 
-## Frontend Design
+## Frontend Design 🎨
 
 The frontend is built using **Handlebars** templating with **Bootstrap** for styling:
 
